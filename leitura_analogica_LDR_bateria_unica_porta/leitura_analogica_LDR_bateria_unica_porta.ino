@@ -1,5 +1,5 @@
-#define pinAtivaBAT  A4 //porta digital que aciona a leitura da bateria
-#define pinAtivaLDR  A5 //porta digital que aciona a leitura do LDR
+#define pinAtivaLDR  2 //porta digital que aciona a leitura do LDR
+#define pinAtivaBAT  3 //porta digital que aciona a leitura da bateria
 #define pinAnalogico A0 //Unica porta usada para leitura
 
 boolean lerLDR;
