@@ -20,20 +20,19 @@
 #define botaoRetirar        A0 //Para tudo para retirada do sorvete
 #define botaoTurbo          A1 //Liga misturador e congelador por um tempo
 
-#define tempoRotinaInicial    1200000 //20 minutos
-#define tempoValvulaligada      20000 //20 segundos
-#define tempoAntesMotores       40000 //40 segundos
-#define tempoMotoresAcionados   90000 //1,5 minutos
+#define tempoRotinaInicial      20000 //20 minutos
+#define tempoValvulaligada       2000 //20 segundos
+#define tempoAntesMotores        4000 //40 segundos
+#define tempoMotoresAcionados    8000 //1,5 minutos
 
-unsigned horaLigarMotores = 0;
-unsigned horaDesligarMotores = 0;
-unsigned horaDesligarValcula = 0;
-
-
+unsigned long horaLigarMotores = 0;
+unsigned long horaDesligarMotores = 0;
+unsigned long horaDesligarValvula = 0;
 
 void setup() {
   //Inicializa comunicação serial para debbug
   Serial.begin( 9600 );
+  Serial.println();
 
   //Configura portas
   pinMode( motorMisturador, OUTPUT );
@@ -53,39 +52,57 @@ void setup() {
   }  
   setMotores( false ); //desliga os motores para dar inicio ao ciclo padrão
 
-  //Inicia o processo padrão ligando a valvula e definindo a hora de desligar a valvula
+  //Inicia o processo padrão ligando a valvula e definindo a hora de desligar a valvula  
+  postaMensagem( F("Iniciando cliclo padrao")  );
+  Serial.println();
   digitalWrite( acionaValvula, HIGH );
-  horaDesligarValcula = millis() + tempoValvulaligada;
+  horaDesligarValvula = millis() + tempoValvulaligada;
+  postaMensagem( F("Valvula ligada")  );
+  
 }
 
 void loop() {
   
-  //desliga valvula passado o tempo de acionamento
-  if (( horaDesligarValcula > 0 ) && ( millis() >= horaDesligarValcula )) {
-    horaDesligarValcula = 0;
-    digitalWrite( acionaValvula, LOW );
-    //define hora de liga os motores
-    horaLigarMotores = millis() + tempoAntesMotores; 
+  //[PADRAO] Desliga valvula passado o tempo de acionamento
+  if ( horaDesligarValvula > 0 ) {
+    Serial.print( "\nDesligar valvula: " + millisToStr( horaDesligarValvula - millis() ) );
+    if ( millis() >= horaDesligarValvula ) {
+      horaDesligarValvula = 0;
+      digitalWrite( acionaValvula, LOW );
+      //define hora de liga os motores
+      horaLigarMotores = millis() + tempoAntesMotores; 
+      postaMensagem( F("Valvula desativada")  );      
+    }
   }
 
-  //Liga motores
-  if (( horaLigarMotores > 0 ) && ( millis() >= horaLigarMotores )) {
-    horaLigarMotores = 0;
-    setMotores( true );
-    //define hora de desligar os motores
-    horaDesligarMotores = millis() + tempoMotoresAcionados;
+  //[PADRAO] Liga motores
+  if ( horaLigarMotores > 0 ){ 
+    Serial.print( "\nLigar motores: " + millisToStr( horaLigarMotores - millis() ) );
+    if( millis() >= horaLigarMotores ) {
+      horaLigarMotores = 0;
+      setMotores( true );
+      //define hora de desligar os motores
+      horaDesligarMotores = millis() + tempoMotoresAcionados;
+      Serial.print( ", desligar em " + millisToStr( tempoMotoresAcionados ));
+    }
   }
 
-  if (( horaDesligarMotores > 0 ) && ( millis() >= horaDesligarMotores )) {
+  //[PADRAO] desliga motores
+  if (( horaDesligarMotores > 0 ) && ( millis() >= horaDesligarMotores )) {    
+    setMotores( false );    
     horaDesligarMotores = 0;
+    
     //Aciona a valvula e programa hora de desligar
     digitalWrite( acionaValvula, HIGH );
-    horaDesligarValcula = millis() + tempoValvulaligada;
+    horaDesligarValvula = millis() + tempoValvulaligada;
+    postaMensagem( F("Valvula ligada")  );
+    Serial.print( ",desligar em " + millisToStr( tempoValvulaligada ) );
   }
 }
 
 void postaMensagem( String mens ) {
-  Serial.println( mens );
+  Serial.println();
+  Serial.print( mens );
 }
 
 
@@ -97,7 +114,7 @@ void setMotores( boolean ligar ) {
     postaMensagem( F( "Ligando motor 2 (ON)") );
     digitalWrite( motorCongelador, HIGH );    
   } else { //desliga
-    postaMensagem( F( "motores desligados (OFF)") ); 
+    postaMensagem( F( "Motores desligados (OFF)") ); 
     digitalWrite( motorMisturador, LOW );     
     digitalWrite( motorCongelador, LOW );       
   }  
