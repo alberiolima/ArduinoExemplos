@@ -11,6 +11,8 @@
  * ==========
  * 
  * postaMensagem => função que escreve a mensagem do LCD e também amensagem de debbug
+ * 
+ * millisToStr => transforma millis em uma string no formato HH:MM:SS
  *  
  */
 
@@ -64,27 +66,21 @@ void setup() {
 void loop() {
   
   //[PADRAO] Desliga valvula passado o tempo de acionamento
-  if ( horaDesligarValvula > 0 ) {
-    Serial.print( "\nDesligar valvula: " + millisToStr( horaDesligarValvula - millis() ) );
-    if ( millis() >= horaDesligarValvula ) {
-      horaDesligarValvula = 0;
-      digitalWrite( acionaValvula, LOW );
-      //define hora de liga os motores
-      horaLigarMotores = millis() + tempoAntesMotores; 
-      postaMensagem( F("Valvula desativada")  );      
-    }
+  if (( horaDesligarValvula > 0 ) &&( millis() >= horaDesligarValvula )) {
+    horaDesligarValvula = 0;
+    digitalWrite( acionaValvula, LOW );
+    //define hora de liga os motores
+    horaLigarMotores = millis() + tempoAntesMotores; 
+    postaMensagem( F("Valvula desativada")  );      
   }
 
   //[PADRAO] Liga motores
-  if ( horaLigarMotores > 0 ){ 
-    Serial.print( "\nLigar motores: " + millisToStr( horaLigarMotores - millis() ) );
-    if( millis() >= horaLigarMotores ) {
-      horaLigarMotores = 0;
-      setMotores( true );
-      //define hora de desligar os motores
-      horaDesligarMotores = millis() + tempoMotoresAcionados;
-      Serial.print( ", desligar em " + millisToStr( tempoMotoresAcionados ));
-    }
+  if (( horaLigarMotores > 0 ) &&( millis() >= horaLigarMotores )){ 
+    horaLigarMotores = 0;
+    setMotores( true );
+    //define hora de desligar os motores
+    horaDesligarMotores = millis() + tempoMotoresAcionados;
+    Serial.print( ", desligar em " + millisToStr( tempoMotoresAcionados ));
   }
 
   //[PADRAO] desliga motores
@@ -108,10 +104,15 @@ void postaMensagem( String mens ) {
 
 void setMotores( boolean ligar ) {
   if ( ligar ) {
-    postaMensagem( F( "Ligando motor 1 (ON)") );
+    postaMensagem( F( "Ligando motor 1 (ON) ") );
     digitalWrite( motorMisturador, HIGH ); 
-    delay( 5000 );
-    postaMensagem( F( "Ligando motor 2 (ON)") );
+    unsigned long tempoAguardar = 5000;
+    while ( tempoAguardar > 0 ) {
+      Serial.print(String(tempoAguardar/1000) + ", ");
+      delay(1000);    
+      tempoAguardar -= 1000;
+    } 
+    Serial.print( F( ": Ligando motor 2 (ON)") );
     digitalWrite( motorCongelador, HIGH );    
   } else { //desliga
     postaMensagem( F( "Motores desligados (OFF)") ); 
