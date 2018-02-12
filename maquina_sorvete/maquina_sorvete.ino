@@ -26,12 +26,12 @@
 #define botaoRetirar        A0 //Para tudo para retirada do sorvete
 #define botaoTurbo          A1 //Liga misturador e congelador por um tempo
 
-#define tempoRotinaInicial       1200 //20 minutos (1200000)
-#define tempoValvulaligada       2000 //9 segundos    (9000)
-#define tempoAntesMotores        4000 //40 segundos  (40000)
-#define tempoMotoresAcionados    8000 //1,5 minutos  (90000)
-#define tempoTurbo              10000 //10 minutos  (600000)
-#define tempoRetirada            5000 //5 minutos   (300000)
+#define tempoRotinaInicial      12000UL //20 minutos (1200000)
+#define tempoValvulaligada       2000UL //9 segundos    (9000)
+#define tempoAntesMotores        4000UL //40 segundos  (40000)
+#define tempoMotoresAcionados    8000UL //1,5 minutos  (90000)
+#define tempoTurbo              10000UL //10 minutos  (600000)
+#define tempoRetirada            5000UL //5 minutos   (300000)
 
 unsigned long horaLigarMotores = 0;
 unsigned long horaDesligarMotores = 0;
