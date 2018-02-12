@@ -18,7 +18,7 @@
 
 #define motorMisturador      8 //Misturador
 #define motorCongelador      9 //Congelador
-#define acionaValvula       10 //Valcula
+#define pinoValvula         10 //Valcula
 #define botaoRetirar        A0 //Para tudo para retirada do sorvete
 #define botaoTurbo          A1 //Liga misturador e congelador por um tempo
 
@@ -26,10 +26,14 @@
 #define tempoValvulaligada       2000 //20 segundos
 #define tempoAntesMotores        4000 //40 segundos
 #define tempoMotoresAcionados    8000 //1,5 minutos
+#define tempoTurbo              10000 //10 minutos
 
 unsigned long horaLigarMotores = 0;
 unsigned long horaDesligarMotores = 0;
 unsigned long horaDesligarValvula = 0;
+boolean TurboAcionado = false;
+boolean RetirarAcionado = false;
+unsigned int contatorRetirada = 0;
 
 void setup() {
   //Inicializa comunicação serial para debbug
@@ -39,7 +43,9 @@ void setup() {
   //Configura portas
   pinMode( motorMisturador, OUTPUT );
   pinMode( motorCongelador, OUTPUT );
-  pinMode( acionaValvula, OUTPUT );
+  pinMode( pinoValvula, OUTPUT );
+  pinMode( botaoTurbo, INPUT_PULLUP); 
+  pinMode( botaoRetirar, INPUT_PULLUP);
 
   postaMensagem( F("Boas vindas")  );
   setMotores( true ); //liga os motores
@@ -57,20 +63,40 @@ void setup() {
   //Inicia o processo padrão ligando a valvula e definindo a hora de desligar a valvula  
   postaMensagem( F("Iniciando cliclo padrao")  );
   Serial.println();
-  digitalWrite( acionaValvula, HIGH );
-  horaDesligarValvula = millis() + tempoValvulaligada;
-  postaMensagem( F("Valvula ligada")  );
-  
+  acionaValvula();  
 }
 
 void loop() {
   
+  //Testa botões
+  if (!(TurboAcionado||RetirarAcionado)) { //Só testa os botões de não tiver turbo ou retirar ativado
+    testaBotoes();  
+  } else {
+    //desabilita as oprações padrao
+    horaLigarMotores = 0;
+    horaDesligarMotores = 0;
+    horaDesligarValvula = 0;
+    
+    if (RetirarAcionado) {
+      postaMensagem( F("Retirar acionado")  );      
+      contatorRetirada++;
+      Serial.println( ": " + String(contatorRetirada));
+    } else if  (TurboAcionado) {
+      postaMensagem( F("Turbo acionado")  );      
+      acionaValvula();
+    }
+  }
+
   //[PADRAO] Desliga valvula passado o tempo de acionamento
   if (( horaDesligarValvula > 0 ) &&( millis() >= horaDesligarValvula )) {
     horaDesligarValvula = 0;
-    digitalWrite( acionaValvula, LOW );
+    digitalWrite( pinoValvula, LOW );
     //define hora de liga os motores
-    horaLigarMotores = millis() + tempoAntesMotores; 
+    if (TurboAcionado) {
+      horaLigarMotores = millis(); //liga o motor logo após desligar a valvula
+    } else {
+      horaLigarMotores = millis() + tempoAntesMotores; 
+    }
     postaMensagem( F("Valvula desativada")  );      
   }
 
@@ -79,7 +105,11 @@ void loop() {
     horaLigarMotores = 0;
     setMotores( true );
     //define hora de desligar os motores
-    horaDesligarMotores = millis() + tempoMotoresAcionados;
+    if (TurboAcionado) {
+      horaDesligarMotores = millis() + tempoTurbo;
+    } else {
+      horaDesligarMotores = millis() + tempoMotoresAcionados;
+    }
     Serial.print( ", desligar em " + millisToStr( tempoMotoresAcionados ));
   }
 
@@ -87,12 +117,10 @@ void loop() {
   if (( horaDesligarMotores > 0 ) && ( millis() >= horaDesligarMotores )) {    
     setMotores( false );    
     horaDesligarMotores = 0;
-    
-    //Aciona a valvula e programa hora de desligar
-    digitalWrite( acionaValvula, HIGH );
-    horaDesligarValvula = millis() + tempoValvulaligada;
-    postaMensagem( F("Valvula ligada")  );
-    Serial.print( ",desligar em " + millisToStr( tempoValvulaligada ) );
+    if (TurboAcionado) {
+      TurboAcionado = false;
+    }    
+    acionaValvula();
   }
 }
 
@@ -136,4 +164,33 @@ String millisToStr( unsigned long ulTempo ) {
   return ( String( iHoras) + ":" + String( iMinutos ) + ":" + String( ulTempo) );
 }
 
+void testaBotoes() {
+  static byte btTurboAntes = LOW;
+  static byte btRetirarAntes = LOW;
+  
+  byte btLido = digitalRead( botaoTurbo );
+  if (( btLido == LOW )&&(btTurboAntes == HIGH)) {
+    delay(5);
+    if ( digitalRead( botaoTurbo ) == LOW ) {
+      TurboAcionado = true;
+    }    
+  }
+  btTurboAntes = btLido;  
 
+  btLido = digitalRead( botaoRetirar );
+  if (( btLido == LOW )&&(btRetirarAntes == HIGH)) {
+    delay(5);
+    if ( digitalRead( botaoRetirar ) == LOW ) {
+      RetirarAcionado = true;
+    }    
+  }
+  btRetirarAntes = btLido;  
+}
+
+void acionaValvula(){
+  //Aciona a valvula e programa hora de desligar
+  digitalWrite( pinoValvula, HIGH );
+  horaDesligarValvula = millis() + tempoValvulaligada;
+  postaMensagem( F("Valvula ligada")  );
+  Serial.print( ",desligar em " + millisToStr( tempoValvulaligada ) );
+}
