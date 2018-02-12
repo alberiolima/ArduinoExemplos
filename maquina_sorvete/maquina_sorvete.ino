@@ -10,9 +10,13 @@
  * setMotores => função que liga ou desliga os motores, liga a primeiro motor aguarda 5 segundos e liga o outro
  * ==========
  * 
- * postaMensagem => função que escreve a mensagem do LCD e também amensagem de debbug
+ * postaMensagem => função que escreve a mensagem do LCD e também a mensagem de debbug
  * 
  * millisToStr => transforma millis em uma string no formato HH:MM:SS
+ * 
+ * testaBotoes => função que teste de algum botão foi acionado
+ * 
+ * acionaValvula => funcão que aciona a valvula e agenda seu desligamento
  *  
  */
 
@@ -22,11 +26,11 @@
 #define botaoRetirar        A0 //Para tudo para retirada do sorvete
 #define botaoTurbo          A1 //Liga misturador e congelador por um tempo
 
-#define tempoRotinaInicial      20000 //20 minutos
-#define tempoValvulaligada       2000 //20 segundos
-#define tempoAntesMotores        4000 //40 segundos
-#define tempoMotoresAcionados    8000 //1,5 minutos
-#define tempoTurbo              10000 //10 minutos
+#define tempoRotinaInicial       1200 //20 minutos (1200000)
+#define tempoValvulaligada       2000 //9 segundos    (9000)
+#define tempoAntesMotores        4000 //40 segundos  (40000)
+#define tempoMotoresAcionados    8000 //1,5 minutos  (90000)
+#define tempoTurbo              10000 //10 minutos  (600000)
 
 unsigned long horaLigarMotores = 0;
 unsigned long horaDesligarMotores = 0;
@@ -82,7 +86,7 @@ void loop() {
     }
   }
 
-  //[PADRAO] Desliga valvula passado o tempo de acionamento
+  //Desliga valvula passado o tempo de acionamento
   if (( horaDesligarValvula > 0 ) &&( millis() >= horaDesligarValvula )) {
     horaDesligarValvula = 0;
     digitalWrite( pinoValvula, LOW );
@@ -95,7 +99,7 @@ void loop() {
     postaMensagem( F("Valvula desativada")  );      
   }
 
-  //[PADRAO] Liga motores
+  //Liga motores
   if (( horaLigarMotores > 0 ) &&( millis() >= horaLigarMotores )){ 
     horaLigarMotores = 0;
     setMotores( true );
@@ -109,7 +113,7 @@ void loop() {
     Serial.print( ", desligar em " + millisToStr( horaDesligarMotores - millis() ));
   }
 
-  //[PADRAO] desliga motores
+  //desliga motores
   if (( horaDesligarMotores > 0 ) && ( millis() >= horaDesligarMotores )) {    
     setMotores( false );    
     horaDesligarMotores = 0;
@@ -122,7 +126,7 @@ void loop() {
 }
 
 void postaMensagem( String mens ) {
-  Serial.println();
+  Serial.write('\n');
   Serial.print( mens );
 }
 
