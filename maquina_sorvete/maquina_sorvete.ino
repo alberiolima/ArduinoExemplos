@@ -71,19 +71,14 @@ void loop() {
   //Testa botões
   if (!(TurboAcionado||RetirarAcionado)) { //Só testa os botões de não tiver turbo ou retirar ativado
     testaBotoes();  
-  } else {
-    //desabilita as oprações padrao
-    horaLigarMotores = 0;
-    horaDesligarMotores = 0;
-    horaDesligarValvula = 0;
-    
     if (RetirarAcionado) {
       postaMensagem( F("Retirar acionado")  );      
       contatorRetirada++;
       Serial.println( ": " + String(contatorRetirada));
-    } else if  (TurboAcionado) {
-      postaMensagem( F("Turbo acionado")  );      
-      acionaValvula();
+    }
+    if (TurboAcionado) {
+     postaMensagem( F("Turbo acionado")  );      
+     acionaValvula();
     }
   }
 
@@ -107,10 +102,11 @@ void loop() {
     //define hora de desligar os motores
     if (TurboAcionado) {
       horaDesligarMotores = millis() + tempoTurbo;
+      Serial.print("[turbo]");
     } else {
       horaDesligarMotores = millis() + tempoMotoresAcionados;
     }
-    Serial.print( ", desligar em " + millisToStr( tempoMotoresAcionados ));
+    Serial.print( ", desligar em " + millisToStr( horaDesligarMotores - millis() ));
   }
 
   //[PADRAO] desliga motores
@@ -118,6 +114,7 @@ void loop() {
     setMotores( false );    
     horaDesligarMotores = 0;
     if (TurboAcionado) {
+      Serial.print( F("\n[turbo] voltando ao ciclo normal" ) );
       TurboAcionado = false;
     }    
     acionaValvula();
@@ -185,6 +182,13 @@ void testaBotoes() {
     }    
   }
   btRetirarAntes = btLido;  
+
+  if (TurboAcionado||RetirarAcionado) {
+    //desabilita as oprações padrao
+    horaLigarMotores = 0;
+    horaDesligarMotores = 0;
+    horaDesligarValvula = 0;
+  }    
 }
 
 void acionaValvula(){
