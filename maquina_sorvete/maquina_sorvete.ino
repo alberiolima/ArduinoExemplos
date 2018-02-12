@@ -31,6 +31,7 @@
 #define tempoAntesMotores        4000 //40 segundos  (40000)
 #define tempoMotoresAcionados    8000 //1,5 minutos  (90000)
 #define tempoTurbo              10000 //10 minutos  (600000)
+#define tempoRetirada            5000 //5 minutos   (300000)
 
 unsigned long horaLigarMotores = 0;
 unsigned long horaDesligarMotores = 0;
@@ -79,6 +80,10 @@ void loop() {
       postaMensagem( F("Retirar acionado")  );      
       contatorRetirada++;
       Serial.println( ": " + String(contatorRetirada));
+      setMotores( true );
+      //define hora de desligar os motores
+      horaDesligarMotores = millis() + tempoRetirada;
+      Serial.print( "[retirada], desligar em " + millisToStr( horaDesligarMotores - millis() ));      
     }
     if (TurboAcionado) {
      postaMensagem( F("Turbo acionado")  );      
@@ -115,13 +120,27 @@ void loop() {
 
   //desliga motores
   if (( horaDesligarMotores > 0 ) && ( millis() >= horaDesligarMotores )) {    
-    setMotores( false );    
-    horaDesligarMotores = 0;
-    if (TurboAcionado) {
-      Serial.print( F("\n[turbo] voltando ao ciclo normal" ) );
-      TurboAcionado = false;
+    horaDesligarMotores = 0;        
+    if (RetirarAcionado) {
+      if ( digitalRead( botaoRetirar ) == HIGH ) {
+        delay(5);
+        if ( digitalRead( botaoRetirar ) == HIGH ) {
+          RetirarAcionado = false;
+        }
+      }
+    }
+    if (RetirarAcionado) {
+      //define nova hora de desligar os motores na retirada
+      Serial.print( F("\n[retirada] reiniciando" ) );
+      horaDesligarMotores = millis() + tempoRetirada;               
+    } else {
+      if (TurboAcionado) {
+        Serial.print( F("\n[turbo] voltando ao ciclo normal" ) );
+        TurboAcionado = false;
+      }      
+      setMotores( false );
+      acionaValvula();      
     }    
-    acionaValvula();
   }
 }
 
