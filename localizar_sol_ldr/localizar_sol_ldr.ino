@@ -21,18 +21,20 @@ void setup() {
   pinMode( pinLDR, INPUT );
   delay(500); 
 
-  //Valores iniciais das variáveis, para não iniciar zeradas, pois gerariam divisão por zero no calculo da média
-  somaLeituras = analogRead( pinLDR );
-  quantLeituras = 1;
-  mediaAnterior = somaLeituras;
-
   meuServo.attach( pinServo ); //Configura qual pino será usado para o servo
   meuServo.write( posiServo ); //Posiciona o servo na posição inicial
-    
+
+  mediaAnterior = analogRead( pinLDR ); //inicia valor anterior da média para não começar com zero    
 }
 
 void loop() {
+  //Leitura do LDR
   int valorLido = analogRead( pinLDR );
+  
+  //Somas valores para calcular a média
+  somaLeituras += valorLido; 
+  quantLeituras++;  
+  
   if ( millis() > proximaLeitura ) {
     proximaLeitura += tempoEntreleituras;
     unsigned long mediaLeituras = somaLeituras / (unsigned long)quantLeituras;
@@ -56,10 +58,6 @@ void loop() {
     Serial.print( valorLido );
     Serial.print( " " );    
     Serial.print( mediaLeituras );
-    Serial.print( " " );   
-        
-  }
-  //Somas valores para calcular a média
-  somaLeituras += valorLido; 
-  quantLeituras++;
+    Serial.print( " " );           
+  }  
 }
