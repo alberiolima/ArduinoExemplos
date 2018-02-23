@@ -15,8 +15,6 @@
  * quando o master receber uma configuração de endereço,quer dizer que todos já estão conectados
  */
 
-#define _MASTER_
-
 #include <SoftwareSerial.h>
 
 SoftwareSerial serial2( 3, 2 ); //RX, TX
@@ -25,17 +23,17 @@ byte cEndComunica = 0;
 byte dadosRecebidos[10];
 byte posiDado = 0;
 
-void enviaEndereco() {
-  byte endereco[4] = {0, 1, cEndComunica + 1, 0 };
-  enviaCommando( endereco );
+void enviaEndereco(){
+  enviaCommando( 0, 1, cEndComunica + 1, 0 );
   delay(100);
-  enviaCommando( endereco );
+  enviaCommando( 0, 1, cEndComunica + 1, 0 );
 }
 
-void enviaCommando( byte comm[] ) {
-  for(byte i = 0; i < 4;i++){
-    serial2.write(comm[i]); 
-  }
+void enviaCommando( byte endereco, byte operacao, byte porta, byte dado ) {
+  serial2.write( endereco );  //Endereço do destinatário 
+  serial2.write( operacao );  //Operação
+  serial2.write( porta );     //Porta para manipular no destinatário
+  serial2.write( dado );      //dado para gravar na porta: HIGH, LOW, 0...255,
   serial2.write('\n'); 
 }
 
@@ -74,8 +72,8 @@ void trataComandos() {
         if ( dadosRecebidos[0] == cEndComunica ) {
           pinMode( dadosRecebidos[2], OUTPUT );
           digitalWrite( dadosRecebidos[2], dadosRecebidos[3] );
-        } else if ( dadosRecebidos[0] > 1 ) { //para o comando para o proximo arduino, tem que ser diferente de 1 que é o master
-          enviaCommando( dadosRecebidos );
+        } else { 
+          enviaCommando( dadosRecebidos[0], dadosRecebidos[1], dadosRecebidos[2], dadosRecebidos[3] );
         }
       }
     } else{

@@ -15,57 +15,46 @@
  * quando o master receber uma configuração de endereço,quer dizer que todos já estão conectados
  */
 
-#define _MASTER_
-
 #include <SoftwareSerial.h>
 
 SoftwareSerial serial2( 3, 2 ); //RX, TX
 
 byte cEndComunica = 0;
-byte dadosRecebidos[10];
-byte posiDado = 0;
 
-void enviaEndereco() {
+void enviaEndereco(){
   enviaCommando( 0, 1, cEndComunica + 1, 0 );
   delay(100);
   enviaCommando( 0, 1, cEndComunica + 1, 0 );
 }
 
 void enviaCommando( byte endereco, byte operacao, byte porta, byte dado ) {
-  serial2.write( endereco );
-  serial2.write( operacao );
-  serial2.write( porta );
-  serial2.write( dado );
+  serial2.write( endereco );  //Endereço do destinatário 
+  serial2.write( operacao );  //Operação
+  serial2.write( porta );     //Porta para manipular no destinatário
+  serial2.write( dado );      //dado para gravar na porta: HIGH, LOW, 0...255,
   serial2.write('\n'); 
 }
 
 void setup() {
   Serial.begin( 9600 );
   Serial.println( "Comunicacao com varios arduinos" );
-  
+  Serial.println( "MASTER");
+    
   serial2.begin( 115200 );  //Inicia porta comunicaçao serial entre arduinos  
+  delay(100); //aguarda um tempo para todos os arduino estarem ligados
   
   //Como esse é o master envia primeiro endereço para o primeiro escravo
-  Serial.println( "MASTER");
-  cEndComunica = 1; //endereço do master
-  delay(100); //aguarda um tempo para todos os arduino estarem ligados
+  cEndComunica = 1; //endereço do master  
   enviaEndereco();  
 }
 
 void loop() {
-  enviaCommando( 2, 0, 4, 1 );
-  delay(200);    
-  enviaCommando( 3, 0, 4, 1 );
-  delay(200);
-    
-  enviaCommando( 4, 0, 4, 1 );
-  delay(200);  
-  enviaCommando( 4, 0, 4, 0 );
-  delay(200);
-
-  enviaCommando( 3, 0, 4, 0 );
-  delay(200);  
-  enviaCommando( 2, 0, 4, 0 );
-  delay(200);        
+  //Destino, operacao, porta, dado
+  enviaCommando( 2, 0, 4, 1 ); delay(100);    
+  enviaCommando( 2, 0, 4, 0 ); delay(100);    
+  enviaCommando( 3, 0, 4, 1 ); delay(100);  
+  enviaCommando( 3, 0, 4, 0 ); delay(100);
+  enviaCommando( 4, 0, 4, 1 ); delay(100);  
+  enviaCommando( 4, 0, 4, 0 ); delay(100);        
 }
 
