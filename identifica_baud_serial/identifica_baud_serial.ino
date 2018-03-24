@@ -22,10 +22,12 @@ int recPin = 0;  //the pin receiving the serial input data
 long baudRate;   // global in case useful elsewhere in a sketch
 long rate;
 
+
+
 void setup()
 {
  pinMode(recPin, INPUT);      // make sure serial in is a input pin
- digitalWrite (recPin, HIGH); // pull up enabled just for noise protection
+ digitalWrite(recPin, HIGH); // pull up enabled just for noise protection
  
  baudRate = detRate(recPin);  // Function finds a standard baudrate of either
                               // 1200,2400,4800,9600,14400,19200,28800,38400,57600,115200 
@@ -48,8 +50,8 @@ long detRate(int recpin){  // function to return valid received baud rate
                          // doesn't seem to work with version 22 hardware serial library
 
   while(digitalRead(recpin) == 1){} // wait for low bit to start
-  long baud;
   rate = pulseIn(recpin,LOW);   // measure zero bit width from character 'U'
+  long baud;  
   if (rate < 10)
     baud = 115200;
   else if (rate < 12)
@@ -64,23 +66,26 @@ long detRate(int recpin){  // function to return valid received baud rate
     baud = 19200;
   else if (rate < 80)
     baud = 14400;
-  else if (rate < 150)
+  else if (rate < 150)  //99-104
     baud = 9600;
-  else if (rate < 300)
+  else if (rate < 300)  //209
     baud = 4800;
   else if (rate < 600)
     baud = 2400;
-  else if (rate < 1200)
+  else if (rate < 1200) //826
     baud = 1200;
-  else if (rate < 2400)
+  else if (rate < 2400) //410
     baud = 600;
-  else if (rate < 4800)
+  else if (rate < 4800) //3309
     baud = 300;     
-  else if (rate < 9600)
+  else if (rate < 9600) 
     baud = 150;         
   else if (rate < 7040) 
-    baud = 110;             
+    baud = 110;
+  else if (rate < 19200) 
+    baud = 75;    
   else 
     baud = 0;  
   return baud; 
  }
+
