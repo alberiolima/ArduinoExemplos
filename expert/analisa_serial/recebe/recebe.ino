@@ -1,10 +1,6 @@
 #define pinRX 3
 #define quantBITS 9
 
-#include <SoftwareSerial.h>
-
-SoftwareSerial outra_serial( 3, 2 ); //RX, TX
-
 unsigned long _bytes[100];
 boolean b_bytes[100];
 unsigned long espera;
