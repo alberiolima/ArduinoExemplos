@@ -47,7 +47,7 @@ void setup() {
 
 void loop() {
   
-    //Testa botoes
+  //Testa botoes
   for ( byte j = 0; j<2;j++){
     botoes[j].estado = digitalRead(botoes[j].pino);
     if ((botoes[j].estado == HIGH )&&( botoes[j].estado != botoes[j].estadoAnterior)) {
@@ -68,11 +68,11 @@ void loop() {
     Serial.print(botoes[0].contaPulso);
     Serial.println(" ]");
 
-    if ( botoes[0].contaPulso == 1 ) {
+    if ( botoes[0].contaPulso == 1 ) { //1 toque no botão1
       digitalWrite( reles[0], !digitalRead( reles[0] ) ); //inverte relé1
-    } else if (botoes[0].contaPulso == 2) {
+    } else if (botoes[0].contaPulso == 2) { //2 toques no botão1
       digitalWrite( reles[1], !digitalRead( reles[1] ) ); //inverte relé2
-    } else if ( botoes[0].contaPulso > 2 ) {
+    } else if ( botoes[0].contaPulso > 2 ) { //se relé1 e rele2 OFF, ficam ON, se relé1 e relé2 ON ficam OFF
       if (digitalRead( reles[0] ) == digitalRead( reles[1] ) ) { //Se rele1 e rele2 estiverem ON torna off, se estiverem off torna ON.
         digitalWrite( reles[0], !digitalRead( reles[0] ) );
         digitalWrite( reles[1], !digitalRead( reles[1] ) );
@@ -83,17 +83,17 @@ void loop() {
     botoes[0].contaPulso = 0;
   }
 
-  //Ação para botão 2
+  //Ação para botão2
   if (( botoes[1].tempo > 0 )&&( millis() > botoes[1].tempo + tempoComando )) {
     Serial.print("TOTAL PULSO BOTAO 02 : [ ");
     Serial.print(botoes[1].contaPulso);
     Serial.println(" ]");
 
-    if (( botoes[1].contaPulso > 0 )&&(botoes[1].contaPulso < 7)) {
+    if (( botoes[1].contaPulso > 0 )&&(botoes[1].contaPulso < 7)) { de 1 a 6 toque no botão2
       digitalWrite( reles[botoes[1].contaPulso+1], !digitalRead( reles[botoes[1].contaPulso+1] ) );
-    } else if ( botoes[1].contaPulso > 6 ) {
-      digitalWrite( reles[2], !digitalRead( reles[2] ) );
-      for ( byte k=3;k<8;k++){
+    } else if ( botoes[1].contaPulso > 6 ) { //mais que 6 toques no botão2
+      digitalWrite( reles[2], !digitalRead( reles[2] ) ); //Inverte relé3
+      for ( byte k=3;k<8;k++){ //Usa o estado do relé3 nos outros relés
         digitalWrite( reles[k], digitalRead( reles[2] ) );
       }    
     }
