@@ -8,7 +8,9 @@
  * Os reles[0] indica a lampada1 e reles[1] a lampada2, o restante seguem o padrão
  * 
  * O botão1 aciona relé[0] e relé[1], que são as lampadas 1 e 2
- * Um toque no botão1 aciona a lampada 1, dois toque a lampada 2, mais de 2 toques, apaga as lampada1 e 2 se ambas acesas, acende lampada1 e 2 se ambas apagadas
+ * Um toque no botão1 aciona a lampada 1, dois toque a lampada 2, 
+ * mais de 2 toques, apaga as lampada1 e 2 se ambas acesas, 
+ * acende lampada1 e 2 se ambas apagadas
  * 
  * O botão2 aciona os relés[2..7], lampadas de 3 a 8
  * Um toque no botão2 aciona a lampada3, dois toques a lampada4 e assim até 6 toque que aciona a lampada 8
