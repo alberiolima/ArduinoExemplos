@@ -90,7 +90,7 @@ void loop() {
     Serial.println(" ]");
 
     if (( botoes[1].contaPulso > 0 )&&(botoes[1].contaPulso < 7)) {
-      digitalWrite( reles[botoes[1].contaPulso+1], digitalRead( reles[botoes[1].contaPulso+1] ) );
+      digitalWrite( reles[botoes[1].contaPulso+1], !digitalRead( reles[botoes[1].contaPulso+1] ) );
     } else if ( botoes[1].contaPulso > 6 ) {
       digitalWrite( reles[2], !digitalRead( reles[2] ) );
       for ( byte k=3;k<8;k++){
