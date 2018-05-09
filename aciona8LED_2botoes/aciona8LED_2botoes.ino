@@ -29,10 +29,8 @@ typedef struct {
 } botao;
 
 botao botoes[2];
-
 byte reles[8] = { 2,3,4,5,6,7,8,9 };
 
-//Método setup, executado uma vez ao ligar o Arduino.
 void setup() {
   botoes[0].pino = 10;
   botoes[1].pino = 11;
