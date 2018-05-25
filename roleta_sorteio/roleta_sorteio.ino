@@ -1,7 +1,25 @@
 /*
+  Dispositivo para executar sorteio,tipo roleta
+  Ela possui 8 LED, que podem ser 8 luzes, adicionando hardware necessário
 
+  Então são 8 LED, cada LED representa um premio, você pode indicar quantas vezes esse premio pode ocorrer
+  Quanto maiora quantidade de um premio, maior a possiblidade de ocorrência, veja exemplo:
 
+  O premio1 tem 3 intens, 
+  O premio2 tem 5 itens e 
+  O premio3 tem 8 itens
 
+  Assim o premio3 tem a maior possiblidade de ocorrer como funciona:
+  é gerada uma sequencia assim:
+  
+  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+  ======================================
+  1,1,1,2,2,2,2,2,3, 3, 3, 3, 3, 3, 3, 3
+  
+  No total são 3 + 5 + 8 = 16 possiblidades
+  
+  um numero aleatório é gerado entre 1 e 16
+  por acaso cai o numero 12, basta saber qual o premio daquela posição, no caso na posição 12 tem o 3, então o premio sorteado foi o 3
 
 */
 
@@ -95,6 +113,12 @@ void jogar() {
   } else {
     itemPremiado = 1;
   }
+  
+  if ( quantidadesPremios[itemPremiado - 1] == 0 ) {
+    //  
+  }
+  
+  
   animaSorteio();
   Serial.print( "Numero premiado: " );
   Serial.println( itemPremiado );
