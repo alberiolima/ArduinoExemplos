@@ -38,14 +38,14 @@ byte quantidadesPremios[quantidadeOpcoes];
 void setup() {
 #if defined(_debbug_i)
   Serial.begin( 9600 );
-  quantidadesPremios[0] = 10;
-  quantidadesPremios[1] = 20;
-  quantidadesPremios[2] = 30;
-  quantidadesPremios[3] = 40;
-  quantidadesPremios[4] = 50;
-  quantidadesPremios[5] = 60;
-  quantidadesPremios[6] = 70;
-  quantidadesPremios[7] = 80;
+  quantidadesPremios[0] = 1;
+  quantidadesPremios[1] = 1;
+  quantidadesPremios[2] = 1;
+  quantidadesPremios[3] = 1;
+  quantidadesPremios[4] = 1;
+  quantidadesPremios[5] = 1;
+  quantidadesPremios[6] = 1;
+  quantidadesPremios[7] = 1;
   Serial.println( "Rotina de sorteio inicia,aperte x para jogar" );
 #endif
 
@@ -86,39 +86,45 @@ void jogar() {
   long quantidadeTotalPremios = 0;
   long somasPremios[quantidadeOpcoes];
   for ( byte j = 0; j < quantidadeOpcoes; j++ ) {
-    quantidadeTotalPremios += (long)quantidadesPremios[j];
+    quantidadeTotalPremios += (long)quantidadesPremios[j] + 1L;
     somasPremios[j] = quantidadeTotalPremios;
   }
-  Serial.print( quantidadeTotalPremios );
+  Serial.print( quantidadeTotalPremios - quantidadeOpcoes );
   Serial.println( " premios para sortear" );
+  if ( quantidadeTotalPremios == quantidadeOpcoes ) {
+    Serial.println( "Não existe premios" );
+    return;
+  }
 
-  long numeroSorteado = random(quantidadeTotalPremios) + 1;
-  Serial.print( "Numero sorteado: " );
-  Serial.println( numeroSorteado );
   byte itemPremiado = 0;
-  if ( numeroSorteado > somasPremios[6] ) {
-    itemPremiado = 8;
-  } else if ( numeroSorteado > somasPremios[5] ) {
-    itemPremiado = 7;
-  } else if ( numeroSorteado > somasPremios[4] ) {
-    itemPremiado = 6;
-  } else if ( numeroSorteado > somasPremios[3] ) {
-    itemPremiado = 5;
-  } else if ( numeroSorteado > somasPremios[2] ) {
-    itemPremiado = 4;
-  } else if ( numeroSorteado > somasPremios[1] ) {
-    itemPremiado = 3;
-  } else if ( numeroSorteado > somasPremios[0] ) {
-    itemPremiado = 2;
-  } else {
-    itemPremiado = 1;
+  while (itemPremiado == 0){
+    long numeroSorteado = random(quantidadeTotalPremios) + 1;  
+    Serial.print( "Numero sorteado: " );
+    Serial.println( numeroSorteado );    
+    if ( numeroSorteado > somasPremios[6] ) {
+      itemPremiado = 8;
+    } else if ( numeroSorteado > somasPremios[5] ) {
+      itemPremiado = 7;
+    } else if ( numeroSorteado > somasPremios[4] ) {
+      itemPremiado = 6;
+    } else if ( numeroSorteado > somasPremios[3] ) {
+      itemPremiado = 5;
+    } else if ( numeroSorteado > somasPremios[2] ) {
+      itemPremiado = 4;
+    } else if ( numeroSorteado > somasPremios[1] ) {
+      itemPremiado = 3;
+    } else if ( numeroSorteado > somasPremios[0] ) {
+      itemPremiado = 2;
+    } else {
+      itemPremiado = 1;
+    }    
+    if ( quantidadesPremios[itemPremiado - 1] == 0 ) {
+      Serial.print( "Sorteado item sem premio: " );
+      Serial.println( numeroSorteado );
+      itemPremiado = 0;
+    }
   }
-  
-  if ( quantidadesPremios[itemPremiado - 1] == 0 ) {
-    //  
-  }
-  
-  
+
   animaSorteio();
   Serial.print( "Numero premiado: " );
   Serial.println( itemPremiado );
