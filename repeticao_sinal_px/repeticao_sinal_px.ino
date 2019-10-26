@@ -1,7 +1,7 @@
 #define PIN_LEITURA 2
 #define PIN_GRAVAR  3
 
-#define sinalLer    LOW
+#define sinalLer    HIGH
 #define sinalGravar HIGH
 
 unsigned long tempoIniciou = 0;
